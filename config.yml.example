@@ -1,0 +1,14 @@
+# docs2md configuration
+input_file: "input/docx/demo.docx"
+output_dir: "output"
+
+# Add the following configuration to adjust the markdown output or remove it if not needed (src/adjust_markdown.py)
+adjust_functions:
+  # - adjust_markdown_tables
+  # - adjust_markdown_headers
+  # - remove_index_texts
+  # - convert_usage_notes
+  # - remove_bug_double_header_tables
+  # - adjust_double_header_tables
+  # - remove_exact_empty_cells_in_tables
+  # - adjust_complex_double_header_tables
