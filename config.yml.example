@@ -3,7 +3,8 @@ input_file: "input/docx/demo.docx"
 output_dir: "output"
 
 # Add the following configuration to adjust the markdown output or remove it if not needed (src/adjust_markdown.py)
-adjust_functions:
+adjust_functions: []
+#adjust_functions:
   # - adjust_markdown_tables
   # - adjust_markdown_headers
   # - remove_index_texts
