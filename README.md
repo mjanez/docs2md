@@ -81,11 +81,36 @@ The adjustment functions are now organized in specialized modules:
 
 ## Usage
 
+### Entry Points
+
+docs2md provides two ways to run the converter:
+
+1. **Simple Entry Point (Recommended)**
+   ```bash
+   python docs2md.py config.yml
+   ```
+   - Self-contained script that handles Python path setup
+   - Works from the project root directory
+   - Provides clear error messages for setup issues
+   - Checks dependencies before running
+
+2. **Direct Module Execution**
+   ```bash
+   pdm run python src/main.py config.yml
+   ```
+   - Uses PDM's environment management
+   - Direct access to the main module
+   - Useful for development and debugging
+
 ### Basic Usage
 
 Convert a document using your configuration file:
 
 ```bash
+# Simple entry point (recommended)
+python docs2md.py config.yml
+
+# Alternative using PDM
 pdm run python src/main.py config.yml
 ```
 
@@ -98,7 +123,11 @@ You can create multiple configuration files for different documents:
 cp config.yml config-document1.yml
 cp config.yml config-document2.yml
 
-# Convert different documents
+# Convert different documents (using simple entrypoint)
+python docs2md.py config-document1.yml
+python docs2md.py config-document2.yml
+
+# Alternative using PDM
 pdm run python src/main.py config-document1.yml
 pdm run python src/main.py config-document2.yml
 ```
@@ -109,7 +138,7 @@ pdm run python src/main.py config-document2.yml
 2. **Update config.yml** with the correct input file path
 3. **Run the converter**:
    ```bash
-   pdm run python src/main.py config.yml
+   python docs2md.py config.yml
    ```
 4. **Check the output** in your specified output directory
 
@@ -278,7 +307,8 @@ With this template, you can create specialized adjustments and easily register t
    - Ensure the file exists and is accessible
 
 3. **Python import errors**
-   - Make sure you're running from the project root: `pdm run python src/main.py config.yml`
+   - Make sure you're running from the project root: `python docs2md.py config.yml`
+   - Alternative: `pdm run python src/main.py config.yml`
    - Verify all dependencies are installed: `pdm install`
 
 4. **Permission errors**
