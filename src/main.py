@@ -26,14 +26,22 @@ def convert_document(config) -> None:
         Exception: If an error occurs during the conversion process.
     """
     try:
+        print(f"Starting conversion process...")
+        print(f"Input file: {config.input_file}")
+        print(f"Output dir: {config.output_dir}")
+        
         input_file = config.input_file
         output_dir = ensure_directory_exists(config.output_dir)
         adjust_functions = config.adjust_functions
+        
+        print(f"Adjustment functions: {adjust_functions}")
 
         # Generate output file names
         output_file_base = get_filename_without_extension(input_file)
         output_file = output_dir / f"{output_file_base}.md"
         adjusted_output_file = output_dir / f"{output_file_base}_adjusted.md"
+        
+        print(f"Output file: {output_file}")
         
         # Set up logging
         log_manager = setup_logging(output_dir, output_file_base)
@@ -44,9 +52,19 @@ def convert_document(config) -> None:
         logging.info("Output file: %s", output_file)
 
         # Convert document to markdown
+        print("Converting document...")
         md = MarkItDown()
         logging.info("Converting document to markdown")
         result = md.convert(str(input_file))
+        
+        # Check if result is None or has no text_content
+        if result is None:
+            raise ValueError("MarkItDown conversion returned None - file may be unsupported or corrupted")
+        
+        if not hasattr(result, 'text_content') or result.text_content is None:
+            raise ValueError("MarkItDown conversion result has no text_content")
+        
+        print("Conversion successful, writing to file...")
         
         # Write initial conversion result
         logging.info("Writing result to output file: %s", output_file)
@@ -62,21 +80,29 @@ def convert_document(config) -> None:
         logging.info("Created adjusted output file: %s", adjusted_output_file)
 
         # Apply adjustments to the adjusted output file
-        for adjust_function_name in adjust_functions:
-            adjust_function = adjust_markdown.get_adjustment_function(adjust_function_name)
-            if adjust_function:
-                try:
-                    adjust_function(str(adjusted_output_file))
-                    logging.info(f"Applied adjustment: {adjust_function_name}")
-                except Exception as e:
-                    logging.error(f"Failed to apply {adjust_function_name}: {e}")
-            else:
-                logging.warning(f"Adjustment function not found: {adjust_function_name}")
+        if adjust_functions:  # Only iterate if there are functions
+            print(f"🔧 Applying {len(adjust_functions)} adjustments...")
+            for adjust_function_name in adjust_functions:
+                adjust_function = adjust_markdown.get_adjustment_function(adjust_function_name)
+                if adjust_function:
+                    try:
+                        adjust_function(str(adjusted_output_file))
+                        logging.info(f"Applied adjustment: {adjust_function_name}")
+                        print(f"  {adjust_function_name}")
+                    except Exception as e:
+                        logging.error(f"Failed to apply {adjust_function_name}: {e}")
+                        print(f"  {adjust_function_name}: {e}")
+                else:
+                    logging.warning(f"Adjustment function not found: {adjust_function_name}")
+                    print(f"  Function not found: {adjust_function_name}")
+        else:
+            print("No adjustment functions configured")
                 
         logging.info("Document conversion and adjustment completed successfully")
         
     except Exception as e:
         logging.error("An error occurred during conversion: %s", str(e))
+        print(f"Error in convert_document: {e}")
         raise
 
 
@@ -91,8 +117,12 @@ def main(config_path: str) -> None:
         SystemExit: If configuration cannot be loaded or conversion fails.
     """
     try:
+        print(f"docs2md starting...")
+        print(f"Config file: {config_path}")
+        
         # Load and validate configuration
         config = load_config(config_path)
+        print(f"Configuration loaded successfully")
         
         # Convert document
         convert_document(config)
@@ -106,6 +136,9 @@ def main(config_path: str) -> None:
     except Exception as e:
         print(f"Conversion error: {e}")
         logging.error("Fatal error in main: %s", str(e))
+        import traceback
+        print(f"Full traceback:")
+        traceback.print_exc()
         sys.exit(1)
 
 
